@@ -7,8 +7,6 @@ import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ext_storage/ext_storage.dart';
 
-
-
 DateTime now = DateTime.now().toUtc();
 String timeColons = ':';
 
@@ -46,24 +44,81 @@ class _HomeStatePage extends State<HomePage> with TickerProviderStateMixin {
   String _timeString;
   String _dateString;
 
- // File _image;
+  // File _image;
 
-   Future getImage(ImgSource source, String namePrefix) async {
 
+
+
+  Future postFlightData() async {
+    final directory =  await ExtStorage.getExternalStoragePublicDirectory(
+        ExtStorage.DIRECTORY_DOCUMENTS);
+     Permission.storage.request().isGranted;
+
+    var myImagePath = '$directory';
+
+    //   ;
+    final fileName = 'FlightData_$depAirport'+ '_$arrAirport' +
+        '_' +
+        '${now.day.toString().padLeft(2, '0')}${now.month.toString().padLeft(2, '0')}${now.year.toString()}' +
+        '_' +
+        '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}.csv';
+    //print('$myImagePath' + '/' + '$fileName');
+
+    try {
+       await Directory(myImagePath).create();
+      myImagePath = myImagePath + '/${now.year.toString()}';
+       await Directory(myImagePath).create();
+      myImagePath = myImagePath + '/${now.month.toString().padLeft(2, '0')}';
+       await Directory(myImagePath).create();
+      myImagePath = myImagePath + '/${now.day.toString().padLeft(2, '0')}';
+       await Directory(myImagePath).create();
+    } catch (e) {
+      // print('ERRORRRR $e');
+    }
+
+    try {
+      final File file = File('$myImagePath' + '/' + '$fileName');
+       file.writeAsString(flightNumber + ',' + depAirport+ ',' + arrAirport+ ',' + _dateString + ',' + blockOffTimeString + ',' + blockOnTimeString + ',' + blockTimeString);
+    } catch (e) {
+      //  print('ERRORRRR $e');
+    }
+
+    flightState = FlightState.onGround;
+    depAirport = 'ZZZZ';
+    arrAirport = 'ZZZZ';
+    altAirport = 'ZZZZ';
+    blockOffTimeString = 'blockOFF';
+    blockOnTimeString = 'blockON';
+    blockTimeString = '--:--';
+    depAirportController.text = 'ZZZZ';
+    arrAirportController.text = 'ZZZZ';
+
+    setState(() {
+      // _image = image;
+       print('$myImagePath' + '/' + '$fileName');
+    });
+
+
+  }
+
+
+
+
+
+  Future getImage(ImgSource source, String namePrefix) async {
     final directory = await ExtStorage.getExternalStoragePublicDirectory(
         ExtStorage.DIRECTORY_DOCUMENTS);
 
- //  final directory = (await getApplicationDocumentsDirectory()).path;
+    //  final directory = (await getApplicationDocumentsDirectory()).path;
 
-   print('MY DIRECTORY NAME IS: ' + directory);
+   // print('MY DIRECTORY NAME IS: ' + directory);
 
-   var statePermission = await Permission.storage.status;
-   print('PErmissions: ' + statePermission.toString());
-   if (await Permission.storage.request().isGranted){
-   }
+   // var statePermission = await Permission.storage.status;
+    //print('PErmissions: ' + statePermission.toString());
+    if (await Permission.storage.request().isGranted) {}
 
-   statePermission = await Permission.storage.status;
-   print('PErmissions: ' + statePermission.toString());
+     // await Permission.storage.status;
+   // print('PErmissions: ' + statePermission.toString());
 
     var image = await ImagePickerGC.pickImage(
       context: context,
@@ -71,43 +126,42 @@ class _HomeStatePage extends State<HomePage> with TickerProviderStateMixin {
       cameraIcon: Icon(
         Icons.add,
         color: Colors.red,
-      ),//cameraIcon and galleryIcon can change. If no icon provided default icon will be present
+      ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
     );
 
-    var myImagePath ='$directory';
+    var myImagePath = '$directory';
 
-      //   ;
-    final fileName =
-        namePrefix + '_' + '${now.day.toString().padLeft(2, '0')}${now.month.toString().padLeft(2, '0')}${now.year.toString()}'+'_'+'${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}.jpg';
-    print('$myImagePath' + '/' +'$fileName');
+    //   ;
+    final fileName = namePrefix +
+        '_' +
+        '${now.day.toString().padLeft(2, '0')}${now.month.toString().padLeft(2, '0')}${now.year.toString()}' +
+        '_' +
+        '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}.jpg';
+    //print('$myImagePath' + '/' + '$fileName');
 
-   try {
-       await Directory(myImagePath).create();
+    try {
+      await Directory(myImagePath).create();
       myImagePath = myImagePath + '/${now.year.toString()}';
       await Directory(myImagePath).create();
       myImagePath = myImagePath + '/${now.month.toString().padLeft(2, '0')}';
-       await Directory(myImagePath).create();
+      await Directory(myImagePath).create();
       myImagePath = myImagePath + '/${now.day.toString().padLeft(2, '0')}';
-       await Directory(myImagePath).create();
-
-   } catch (e) {
-     print('ERRORRRR $e');
-   }
+      await Directory(myImagePath).create();
+    } catch (e) {
+     // print('ERRORRRR $e');
+    }
 
     try {
-       await image.copy(
-          '$myImagePath' + '/' + '$fileName');
-    }catch(e){
-      print('ERRORRRR $e');
+      await image.copy('$myImagePath' + '/' + '$fileName');
+    } catch (e) {
+    //  print('ERRORRRR $e');
     }
 
     setState(() {
-     // _image = image;
-      print('$myImagePath' + '/' +'$fileName');
-
+      // _image = image;
+     // print('$myImagePath' + '/' + '$fileName');
     });
   }
-
 
   @override
   void initState() {
@@ -124,8 +178,8 @@ class _HomeStatePage extends State<HomePage> with TickerProviderStateMixin {
     depAirportController = TextEditingController(text: "ZZZZ");
     arrAirportController = TextEditingController(text: "ZZZZ");
 
-    _timer =
-        Timer.periodic(Duration(milliseconds: 500), (Timer t) => _getCurrentTime());
+    _timer = Timer.periodic(
+        Duration(milliseconds: 500), (Timer t) => _getCurrentTime());
 
     _animationController = AnimationController(
       vsync: this,
@@ -381,7 +435,7 @@ class _HomeStatePage extends State<HomePage> with TickerProviderStateMixin {
                       "FMS",
                       style: TextStyle(color: textColor),
                     ),
-                     onPressed: () => getImage(ImgSource.Camera, 'FMS'),
+                    onPressed: () => getImage(ImgSource.Camera, 'FMS'),
                     color: backgroundColor,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4.0),
@@ -571,16 +625,10 @@ class _HomeStatePage extends State<HomePage> with TickerProviderStateMixin {
     var _finishOnPressed;
 
     if (flightState == FlightState.landed) {
+
       _finishOnPressed = () {
-        flightState = FlightState.onGround;
-        depAirport = 'ZZZZ';
-        arrAirport = 'ZZZZ';
-        altAirport = 'ZZZZ';
-        blockOffTimeString = 'blockOFF';
-        blockOnTimeString = 'blockON';
-        blockTimeString = '--:--';
-        depAirportController.text = 'ZZZZ';
-        arrAirportController.text = 'ZZZZ';
+        postFlightData();
+
         _finishOnPressed = null;
       };
     }
