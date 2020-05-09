@@ -341,15 +341,24 @@ class _HomeStatePage extends State<HomePage> with TickerProviderStateMixin {
                   icon: AnimatedIcons.pause_play,
                   progress: _animationController,
                 ),
-//                Icon(
-//                  Icons.arrow_forward,
-//                  color: iconGreen,
-//                  size: 24.0,
-//                ),
-                SizedBox(height: 21.0),
-                Text(flightNumber,
-                    style: TextStyle(color: darkTextColor, fontSize: 16)),
-                SizedBox(height: 35.0),
+                ButtonTheme(
+                  height: 20.0,
+                  child: RaisedButton(
+                    child: Text(
+                      flightNumber,
+                      style: TextStyle(color: textColor),
+                    ),
+                    onPressed: () => _flightNumberDialog(),
+                    color: backgroundColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                        side: BorderSide(color: darkTextColor)),
+                    textColor: textColor,
+                    //padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    splashColor: Colors.grey,
+                  ),
+                ),
+                SizedBox(height: 17.0),
                 Text(blockTimeString,
                     style: TextStyle(color: textColor, fontSize: 20)),
                 SizedBox(height: 15.0)
@@ -666,5 +675,35 @@ class _HomeStatePage extends State<HomePage> with TickerProviderStateMixin {
             ],
           ))
     ];
+  }
+
+  void _flightNumberDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('Select Flight Number'),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                   flightNumber = 'RA02772';
+                   Navigator.of(context).pop();
+                },
+                child: const Text('RA02772'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                   flightNumber = 'RA07887';
+                   Navigator.of(context).pop();
+
+                },
+                child: const Text('RA07887'),
+              ),
+
+
+
+            ],
+          );
+        });
   }
 }
